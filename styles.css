@@ -1,0 +1,80 @@
+:root{
+  --g1:#091e3a; --g2:#2c3e50;
+  --ink:#f3f6fb; --mut:#d5deec;
+  --glass:#ffffff12; --stroke:#ffffff24; --glow:#ffffff22;
+  --accent:#7bdff2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:Inter,system-ui,"Segoe UI",Roboto,Ubuntu,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(135deg,var(--g1),var(--g2));
+  display:flex; align-items:center; justify-content:center;
+  padding:18px;
+}
+
+/* Карточка */
+.cf-wrap{width:100%; max-width:520px}
+.cf-card{
+  position:relative; text-align:center; padding:38px 34px 28px;
+  background:var(--glass); border:1px solid var(--stroke); border-radius:18px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 14px 34px rgba(0,0,0,.28);
+}
+.cf-badge{
+  position:absolute; top:-18px; right:-18px; width:46px; height:46px;
+  background:var(--glow); border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+h1{font-size:26px; font-weight:700; margin:6px 0 14px}
+
+/* Лоадер */
+.cf-loader{display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:10px}
+.cf-spinner{
+  width:40px; height:40px; border-radius:50%;
+  border:3px solid rgba(255,255,255,.25);
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+.cf-spinner.cf-spinner-paused{animation-play-state:paused}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.cf-bar{
+  position:relative; width:100%; max-width:360px; height:8px;
+  background:rgba(255,255,255,.12); border-radius:999px; overflow:hidden;
+}
+.cf-bar-fill{
+  position:absolute; left:-40%; top:0; bottom:0; width:40%;
+  background:linear-gradient(90deg, rgba(255,255,255,.2), var(--accent), rgba(255,255,255,.2));
+  animation: slide 1.2s ease-in-out infinite;
+}
+.cf-bar-fill.cf-bar-paused{animation-play-state:paused}
+
+@keyframes slide{
+  0%{left:-40%}
+  50%{left:60%}
+  100%{left:110%}
+}
+
+/* Тексты и кнопка */
+.cf-status{font-size:16px; color:var(--mut); margin-bottom:6px}
+.cf-error{font-size:14px; color:#ff8a80; min-height:1.25em; margin-top:4px}
+
+.cf-btn{
+  margin-top:10px;
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 14px; gap:8px;
+  color:#0b2545; background:#e6f7ff; border:1px solid #bfefff;
+  border-radius:10px; text-decoration:none; font-weight:600;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.cf-btn:hover{transform:translateY(-1px); box-shadow:0 6px 16px rgba(0,0,0,.18)}
+
+@media (max-width:480px){
+  .cf-card{padding:28px 22px 22px}
+  h1{font-size:22px}
+  .cf-status,.cf-error{font-size:14px}
+  .cf-badge{width:40px;height:40px;top:-16px;right:-16px}
+}
